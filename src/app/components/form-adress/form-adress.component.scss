@@ -1,0 +1,12 @@
+// Mise en form de la mat-card
+:host {
+
+    mat-card {
+        display: inline-block;
+
+        mat-form-field {
+            display: block;
+            max-width: 100%;
+        }
+    }
+}
