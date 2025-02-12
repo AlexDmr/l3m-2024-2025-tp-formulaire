@@ -5,12 +5,12 @@ import { FormAdressComponent } from './components/form-adress/form-adress.compon
 @Component({
   selector: 'app-root',
   imports: [
-    RouterOutlet,
+    // RouterOutlet,
     FormAdressComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'l3m-2024-2025-tp-formulaire';
+
 }

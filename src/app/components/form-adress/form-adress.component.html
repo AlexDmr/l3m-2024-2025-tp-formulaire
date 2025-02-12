@@ -4,29 +4,26 @@
  On utilise la bibliothèque angular material.
  -->
 
-<mat-card>
-    <mat-card-header>
-        <mat-card-title>
-            <h1>Form Adress</h1>
-        </mat-card-title>
-        <!-- <mat-card-subtitle>Dog Breed</mat-card-subtitle> -->
-    </mat-card-header>
-    <mat-card-content>
-        CARTE ICI
-    </mat-card-content>
-    <mat-card-footer>
-        <mat-form-field>
-            <input  type="text" 
-                    placeholder="Adresse" 
-                    aria-label="Adresse"
-                    matInput 
-                    [formControl]="searchControl"
-                [matAutocomplete]="auto" />
-            <mat-autocomplete #auto="matAutocomplete">
-                @for (option of searchOptions(); track option) {
-                <mat-option [value]="option">{{option}}</mat-option>
-                }
-            </mat-autocomplete>
-        </mat-form-field>
-    </mat-card-footer>
-</mat-card>
+<div    style = "height: 400px; width: 400px;"
+        leaflet
+        [leafletOptions]="mapOptions"
+        [leafletLayers]="mapLayers()"
+        >
+</div>
+<form>
+    <mat-form-field>
+        <input  type="text" 
+                placeholder="Adresse" 
+                aria-label="Adresse"
+                matInput 
+                [formControl]="searchControl"
+            [matAutocomplete]="auto" />
+        <mat-autocomplete #auto="matAutocomplete" (optionActivated)="onOptionActivated($event)">
+            @for (option of searchOptions(); track option) {
+            <mat-option [value]="option" (hover)="onSelectionChange($event)">
+                {{option}}
+            </mat-option>
+            }
+        </mat-autocomplete>
+    </mat-form-field>
+</form>
