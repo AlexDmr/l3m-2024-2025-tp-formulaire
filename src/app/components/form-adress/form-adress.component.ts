@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -15,14 +15,18 @@ import { CommonModule } from '@angular/common';
 import { Feature, Point } from 'geojson';
 import { Adress } from '../../data/adress';
 
-interface InternalAdress {
-  readonly feature: Feature<Point, Adress>;
-  readonly marker: Marker;
-}
+type InternalAdress = Feature<Point, Adress>;
 interface InternalState {
   readonly currentAdress?: InternalAdress;
+  readonly overAdress?: InternalAdress;
   readonly possibleAdresses: readonly InternalAdress[];
   readonly displayPossibleAdresses: boolean;
+}
+
+const emptyInternalState: InternalState = {
+  currentAdress: undefined,
+  possibleAdresses: [],
+  displayPossibleAdresses: false
 }
 
 @Component({
@@ -44,16 +48,24 @@ export class FormAdressComponent {
   private readonly _srvAdress = inject(AdressService);
 
   /**
+   * COnstituants of the internal state
+   */
+  private readonly _overAdress = signal<InternalAdress | undefined>(undefined);
+  private readonly _currentAdress = signal<InternalAdress | undefined>(undefined);
+  protected readonly displayPossibleAdresses = signal<boolean>(false);
+  private readonly _possibleAdresses = toSignal<readonly InternalAdress[]>(
+    this._srvAdress.searchResults.pipe(
+      map(fc => fc === undefined ? [] : fc.features),
+    ),
+    { requireSync: true }
+  );
+
+  /**
    * Search form control
    */
   private readonly _fb = inject(FormBuilder);
   protected readonly searchControl = this._fb.control("");
-  protected readonly searchOptions = toSignal<readonly string[]>(
-    this._srvAdress.searchResults.pipe(
-      tap(fc => console.log(fc)),
-      map(fc => fc === undefined ? [] : fc.features.map(f => f.properties.label)),
-    )
-  )
+  protected readonly searchOptions = toSignal(this._srvAdress.searchResults);
 
   /**
    * Leaflet map
@@ -65,20 +77,42 @@ export class FormAdressComponent {
     zoomControl: false,
     attributionControl: false
   }
-  private readonly _mapMarkers = toSignal<readonly Marker[]>(
-    this._srvAdress.searchResults.pipe(
-      map(fc => fc === undefined ? [] : fc.features.map(f => latLng(f.geometry.coordinates[1], f.geometry.coordinates[0]))),
-      tap( L => console.log(L) ),
-      map(L => L.map(pt => getMarker(pt))),
-    ),
-    { requireSync: true}
-  )
+  
+  private readonly _mapMarkers = computed<readonly Marker[]>(
+    () => {
+      const S = this.internaleState();
+      const blueAdress = S.overAdress ?? S.currentAdress;
+      return S.displayPossibleAdresses ? S.possibleAdresses.map(
+        ad => getMarker(ad, {
+          color: ad === blueAdress ? 'blue' : 'grey',
+          onClick: () => this.onSelectionChange(ad),
+          onOver: () => this.onOverAdressChange(ad),
+          onLeave: () => this.onOverAdressChange(undefined)
+        })
+      ) : [
+          ...(S.currentAdress ? [getMarker(S.currentAdress, { color: 'blue' })] : [])
+      ]
+    }
+  );
   protected readonly mapLayers = computed<Layer[]>(
     () => [
       this.baseLayer,
       ...this._mapMarkers()
     ]
   );
+
+  /**
+   * Internal state
+   */
+  protected readonly internaleState = computed(
+    () => ({
+      currentAdress: this._currentAdress(),
+      overAdress: this._overAdress(),
+      possibleAdresses: this._possibleAdresses(),
+      displayPossibleAdresses: this.displayPossibleAdresses()
+    })
+  );
+
   /**
    * Constructor
    */
@@ -95,12 +129,16 @@ export class FormAdressComponent {
   /**
    * Interaction
    */
-  onOptionActivated(e: unknown): void {
-    console.log("onOptionActivated", e);
+  protected getAdressLabel(adress: InternalAdress | string): string {
+    return typeof adress === 'string' ? adress : adress.properties.label;
   }
 
-  onSelectionChange(e: unknown): void {
-    console.log("onSelectionChange", e);
+  protected onSelectionChange(e: InternalAdress | undefined): void {
+    this._currentAdress.set(e);
+    this.searchControl.setValue(e?.properties.label ?? '');
   }
   
+  protected onOverAdressChange(e: InternalAdress | undefined): void {
+    this._overAdress.set(e);
+  }
 }

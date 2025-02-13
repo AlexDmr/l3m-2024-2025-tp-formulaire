@@ -30,7 +30,7 @@ export function getParserJSONFeatureCollection<G extends Geometry, T = any>(
     propertiesParser: (o: unknown) => Promise<T>
   ): Promise<Feature<G, T>> {
     return Promise.all([
-        geometryParser(feature.geometry),
+        geometryParser  (feature.geometry  ),
         propertiesParser(feature.properties)
     ]).then(
         ([geometry, properties]) => ({
