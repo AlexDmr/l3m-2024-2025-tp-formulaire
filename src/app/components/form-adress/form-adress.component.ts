@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, output, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -6,7 +6,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { SelectAdressState } from '../../data/SelectAdressState';
 import { Feature, Point } from 'geojson';
 import { Adress } from '../../data/Adress';
-import { debounceTime } from 'rxjs';
+import { debounceTime, filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -28,13 +28,22 @@ export class FormAdressComponent {
   /**
    * Search form control
    */
+  private readonly _searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly _fb = inject(FormBuilder);
-  protected readonly searchControl = this._fb.nonNullable.control("");
+  protected readonly searchControl = this._fb.nonNullable.control<string | Feature<Point, Adress>>("");
   private readonly _emitSearch = this.searchControl.valueChanges.pipe(
     debounceTime(300),
+    filter(q => typeof q === 'string'),
     takeUntilDestroyed()
   ).subscribe( q => this.search.emit(q) );
 
+  private _effSearchAdress = effect(
+    () => {
+      console.log(this._searchInput())
+      if (document.activeElement !== this._searchInput()?.nativeElement)
+        this.searchControl.setValue(this.chooseAmong().currentAdress ?? '', { emitEvent: false });
+    }
+  )
   /**
    * Interaction
    */

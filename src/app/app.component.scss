@@ -1,0 +1,22 @@
+:host {
+    display: grid;
+    grid-template-areas:
+        "title title"
+        " map  form";
+    grid-template-columns: 400px 1fr; // Une colonne fixe pour la carte, une flexible pour le formulaire
+    grid-template-rows: auto 1fr;
+    gap: 8px; // Espace entre les éléments
+
+    h1 {
+        grid-area: title;
+        text-align: center;
+    }
+
+    app-map-adress {
+        grid-area: map;
+    }
+
+    app-form-adress {
+        grid-area: form;
+    }
+}

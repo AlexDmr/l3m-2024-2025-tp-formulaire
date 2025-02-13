@@ -33,8 +33,11 @@ export class MapAdressComponent {
       return S.displayPossibleAdresses ? S.possibleAdresses.map(
         ad => getMarker(ad, {
           color: ad === blueAdress ? 'blue' : 'grey',
-          onClick: () => this.chooseChange.emit({currentAdress: ad, displayPossibleAdresses: false}),
-          onOver:  () => this.chooseChange.emit({ overAdress: ad }),
+          onClick: () => this.chooseChange.emit({ currentAdress: ad, displayPossibleAdresses: false }),
+          onOver: () => {
+            if ( this.chooseAmong().overAdress !== ad)
+              this.chooseChange.emit({ overAdress: ad })
+            },
           onLeave: () => this.chooseChange.emit({ overAdress: undefined })
         })
       ) : [

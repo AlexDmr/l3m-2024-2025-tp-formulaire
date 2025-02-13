@@ -29,7 +29,6 @@ export class AppComponent {
     ),
     switchMap(
       sas => this.updates.pipe(
-        // tap(u => console.log("update", u)),
         scan((s, u) => ({ ...s, ...u }), sas),
         startWith(sas)
       )
@@ -41,7 +40,6 @@ export class AppComponent {
   );
 
   protected search(q: string): void {
-    console.log("search", q);
     this._srvAdress.search(q);
   }
 }

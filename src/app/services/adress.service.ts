@@ -20,7 +20,7 @@ export class AdressService {
   private readonly _httpClient = inject(HttpClient);
   private readonly _searchSubject = new Subject<string>();
   private readonly _searchObs: Observable<FeatureCollection<Point, Adress> | undefined> = this._searchSubject.pipe(
-    switchMap( q => this._httpClient.get(`https://api-adresse.data.gouv.fr/search/`, { observe: 'response', params: { q } }) ),
+    switchMap( q => this._httpClient.get(`https://api-adresse.data.gouv.fr/search/`, { observe: 'response', params: { q, limit: 5 } }) ),
     switchMap(r => r.ok ? parserFcPtAdresse(r.body) : of(undefined)),
     takeUntilDestroyed(this._destroyRef)
   )
