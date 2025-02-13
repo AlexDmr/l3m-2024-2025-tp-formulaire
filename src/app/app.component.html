@@ -1,3 +1,10 @@
 <h1>TP formulaire</h1>
 
-<app-form-adress></app-form-adress>
+<app-map-adress     [choose-among] = "selectedAdressState()"
+                    (choose-change)= "updates.next($event)"
+                    ></app-map-adress>
+
+<app-form-adress    [choose-among] = "selectedAdressState()"
+                    (search)       = "search($event)"
+                    (choose-change)= "updates.next($event)"
+                    ></app-form-adress>

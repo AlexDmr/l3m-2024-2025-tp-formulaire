@@ -1,16 +1,4 @@
-<!-- 
- Formulaire HTML pour siair une adresse, 
- un champs libre pour la recherche plus des champs structurés.
- On utilise la bibliothèque angular material.
- -->
-@let S = internaleState();
 
-<div    style = "height: 400px; width: 400px;"
-        leaflet
-        [leafletOptions]="mapOptions"
-        [leafletLayers]="mapLayers()"
-        >
-</div>
 <div class="form-adress">
     <mat-form-field>
         <input  type="text" 
@@ -18,23 +6,24 @@
                 aria-label="Adresse"
                 matInput 
                 [formControl]="searchControl"
-                [matAutocomplete]="auto" 
+                [matAutocomplete]="auto"
+                
                 />
         <mat-autocomplete 
             #auto = "matAutocomplete" 
             [displayWith] = "getAdressLabel"
             (optionActivated) = "onOverAdressChange($event.option?.value)"
             (optionSelected)  = "onSelectionChange($event.option.value)"
-            (opened) = "displayPossibleAdresses.set(true)"
-            (closed) = "displayPossibleAdresses.set(false)"
+            (opened) = "chooseChange.emit({displayPossibleAdresses: true})"
+            (closed) = "chooseChange.emit({displayPossibleAdresses: false})"
             >
-            @for (option of S.possibleAdresses; track option) {
+            @for (option of chooseAmong().possibleAdresses; track option) {
             <mat-option 
                 [value]="option" 
                 (pointerenter)="onOverAdressChange(option)"
                 (pointerleave)="onOverAdressChange(undefined)"
                 >
-                <span [style.font-weight]="option === S.overAdress ? 'bold' : 'normal'">
+                <span [style.font-weight]="option === chooseAmong().overAdress ? 'bold' : 'normal'">
                     {{option.properties.label}}
                 </span>
             </mat-option>

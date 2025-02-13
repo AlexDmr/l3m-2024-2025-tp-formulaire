@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable, of, Subject, switchMap } from 'rxjs';
 import { getParserJSONFeatureCollection } from '../data/utils.geo';
 import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON2DPointSchema } from 'zod-geojson';
-import { Adress, parseAdress } from '../data/adress';
+import { Adress, parseAdress } from '../data/Adress';
 
 const parserFcPtAdresse = getParserJSONFeatureCollection(
   o => GeoJSON2DPointSchema.parseAsync(o).then( pt => pt as Point ),
