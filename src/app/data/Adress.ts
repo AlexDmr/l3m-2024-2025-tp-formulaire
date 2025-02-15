@@ -24,6 +24,6 @@ const adressSchema = zod.object({
     city: zod.string(),
 }).readonly();
 
-export function parseAdress(obj: unknown): Promise<Adress> {
+export function parserAdress(obj: unknown): Promise<Adress> {
     return adressSchema.parseAsync(obj);
 }

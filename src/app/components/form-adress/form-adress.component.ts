@@ -21,9 +21,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './form-adress.component.scss'
 })
 export class FormAdressComponent {
+  // Inputs
   public readonly chooseAmong = input.required<SelectAdressState>({ alias: "choose-among" });
+  
+  // Outputs
   public readonly chooseChange = output<Partial<Pick<SelectAdressState, "displayPossibleAdresses" | "currentAdress" | "overAdress">>>({ alias: "choose-change" });
-  public readonly search = output<string>();
+  public readonly search       = output<string>();
 
   /**
    * Search form control
@@ -31,6 +34,7 @@ export class FormAdressComponent {
   private readonly _searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly _fb = inject(FormBuilder);
   protected readonly searchControl = this._fb.nonNullable.control<string | Feature<Point, Adress>>("");
+  
   private readonly _emitSearch = this.searchControl.valueChanges.pipe(
     debounceTime(300),
     filter(q => typeof q === 'string'),
@@ -39,13 +43,14 @@ export class FormAdressComponent {
 
   private _effSearchAdress = effect(
     () => {
-      console.log(this._searchInput())
+      const ca = this.chooseAmong().currentAdress;
       if (document.activeElement !== this._searchInput()?.nativeElement)
-        this.searchControl.setValue(this.chooseAmong().currentAdress ?? '', { emitEvent: false });
+        this.searchControl.setValue(ca ?? '', { emitEvent: false });
     }
   )
+  
   /**
-   * Interaction
+   * For data-bindings
    */
   protected getAdressLabel(adress: Feature<Point, Adress> | string): string {
     return typeof adress === 'string' ? adress : adress.properties.label;
@@ -53,7 +58,6 @@ export class FormAdressComponent {
 
   protected onSelectionChange(ad: Feature<Point, Adress> | undefined): void {
     this.chooseChange.emit({ currentAdress: ad });
-    // this.searchControl.setValue(ad?.properties.label ?? '');
   }
   
   protected onOverAdressChange(ad: Feature<Point, Adress> | undefined): void {

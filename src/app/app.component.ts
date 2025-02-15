@@ -1,16 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { FormAdressComponent } from './components/form-adress/form-adress.component';
 import { AdressService } from './services/adress.service';
 import { MapAdressComponent } from './components/map-adress/map-adress.component';
 import { emptySelectedAdressState, SelectAdressState } from './data/SelectAdressState';
-import { map, Observable, scan, startWith, Subject, switchMap, tap } from 'rxjs';
+import { catchError, map, Observable, of, scan, startWith, Subject, switchMap, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
   imports: [
-    // RouterOutlet,
     FormAdressComponent,
     MapAdressComponent
   ],
@@ -20,12 +18,23 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class AppComponent {
   private readonly _srvAdress = inject(AdressService);
   protected readonly updates = new Subject<Partial<SelectAdressState>>();
-  private readonly _selectedAdressStateObs: Observable<SelectAdressState> = this._srvAdress.searchResults.pipe(
-    map(
-      fc => fc === undefined ? emptySelectedAdressState : {
-        possibleAdresses: fc.features,
-        displayPossibleAdresses: true
-      }
+  private readonly _searchQuery = new Subject<string>();
+  private readonly _selectedAdressStateObs: Observable<SelectAdressState> = this._searchQuery.pipe(
+    switchMap(
+      q => this._srvAdress.search(q).pipe(
+        map(
+          fc => ({
+            possibleAdresses: fc.features,
+            displayPossibleAdresses: true
+          })
+        ),
+        catchError(
+          err => {
+            console.error("catchError", err);
+            return of(emptySelectedAdressState);
+          }
+        ),
+      )
     ),
     switchMap(
       sas => this.updates.pipe(
@@ -34,12 +43,13 @@ export class AppComponent {
       )
     )
   );
+
   protected readonly selectedAdressState = toSignal(
     this._selectedAdressStateObs,
     { initialValue: emptySelectedAdressState }
   );
 
   protected search(q: string): void {
-    this._srvAdress.search(q);
+    this._searchQuery.next(q);
   }
 }
