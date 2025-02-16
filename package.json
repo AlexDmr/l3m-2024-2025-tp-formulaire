@@ -1,6 +1,6 @@
 {
   "name": "l3m-2024-2025-tp-formulaire",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
