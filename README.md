@@ -9,7 +9,7 @@ On s'appuiera sur :
 
 On vous fourni un squelette de projet Angular, avec les dépendances nécessaires, ainsi que le composant `FormAdressComponent` qui implémente un champs de recherche d'adresse avec auto-complétion.
 
-## Complétez le service `AdresseService`
+## A) Complétez le service `AdresseService`
 
 La méthode `search` du service `AdresseService` doit appeler l'API `api-adresse.data.gouv.fr` pour récupérer les adresses correspondant à la recherche de l'utilisateur. Vous vous appuierez sur le service `HttpClient` d'Angular pour effectuer la requête. Notez que ce service est déjà injecté dans le service `AdresseService`.
 
@@ -22,17 +22,35 @@ this._httpClient.get(
 )
 ```
 
+### A.1) Expliquer ce que le code ci-dessus fait. 
+
+Détaillez les données envoyées et le type de réponse attendu.
+
+### A.2) Dérivation d'observable
+
 Vous devez dériver cet observable afin de vérifier que la réponse contient bien un code confirmant le succès de la requête. Soit `r` la réponse, alors :
-* Si `r.ok`, il faut vérifier que le corp de la réponse (`r.body`) contient bien un `FeatureCollection<Point, Adress>`. Vous utiliserez pour cela la fonction `parserFcPtAdresse` définie au début du fichier `adresse.service.ts`.
+* Si `r.ok`, il faut vérifier que le corp de la réponse (`r.body`) contient bien un `FeatureCollection<Point, Adress>`. Vous utiliserez pour cela la fonction **`parserFcPtAdresse`** définie au début du fichier `adresse.service.ts`.
 * Sinon, il faut lever une erreur à l'aide de la fonction RxJS `throwError`.
 
 **Indication**: Voir l'opérateur `switchMap` de RxJS.
 
-## Orchestration dans le composant racine
+## B) Orchestration dans le composant racine
 
-1) Expliquez comment est définit l'attribut `selectedAdressState` ? Quel est son type ? Sa valeur initiale ? Comment est-il mis à jour ?
+### B.1) Explications
 
-2) Définissez l'observable `_selectedAdressStateObs`, dérivez le à partir du sujet `_searchQuery`.
+Expliquez comment est définit l'attribut `selectedAdressState` ? 
+Quel est son type ? 
+Sa valeur initiale ? 
+Comment est-il mis à jour ?
 
-3) Prenez aussi en compte les mises à jours (observable `updates`) pour mettre à jour les valeurs produites par `_selectedAdressStateObs`.
+### B.2) Code
 
+Définissez l'observable `_selectedAdressStateObs`, 
+dérivez le à partir du sujet `_searchQuery`.
+
+**Indication**: Vous aurez besoin de `switchMap`, `map` et `catchError` de RxJS.
+### B.3) Mises à jour
+
+Prenez aussi en compte les mises à jours (observable `updates`) pour mettre à jour les valeurs produites par `_selectedAdressStateObs`.
+
+**Indication**: Vous aurez besoin de `scan` et de `startWith` de RxJS.
