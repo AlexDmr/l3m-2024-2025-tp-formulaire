@@ -9,6 +9,10 @@ On s'appuiera sur :
 
 On vous fourni un squelette de projet Angular, avec les dépendances nécessaires, ainsi que les composants `FormAdressComponent` qui implémente un champs de recherche d'adresse avec auto-complétion et `MapAdressComponent` qui affiche la carte correspondante.
 
+Le comportement final attendu est celui du lien suivant : https://alexdmr.github.io/l3m-2024-2025-tp-formulaire/
+
+Vous pouvez tester en entrant comme adresse `fontaine`.
+
 ## A) Compréhension générale
 
 * Quelles sont les entrées et sorties des composants `FormAdressComponent` et `MapAdressComponent` ?
